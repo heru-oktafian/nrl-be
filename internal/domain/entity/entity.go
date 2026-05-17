@@ -1,18 +1,43 @@
 package entity
 
-import "time"
+import (
+	"database/sql"
+	"time"
+)
 
 type Profile struct {
-	ID        int       `json:"id"`
-	Name      string    `json:"name"`
-	Title     string    `json:"title"`
-	Bio       string    `json:"bio"`
-	Email     string    `json:"email"`
-	Phone     string    `json:"phone"`
-	Location  string    `json:"location"`
-	ImageURL  string    `json:"image_url"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID        int            `json:"id"`
+	Name      string         `json:"name"`
+	Title     string         `json:"title"`
+	Bio       string         `json:"bio"`
+	Email     string         `json:"email"`
+	Phone     sql.NullString `json:"-"`
+	Location  sql.NullString `json:"-"`
+	ImageURL  sql.NullString `json:"-"`
+	CreatedAt time.Time      `json:"created_at"`
+	UpdatedAt time.Time      `json:"updated_at"`
+}
+
+// Getters for JSON serialization
+func (p *Profile) GetPhone() string {
+	if p.Phone.Valid {
+		return p.Phone.String
+	}
+	return ""
+}
+
+func (p *Profile) GetLocation() string {
+	if p.Location.Valid {
+		return p.Location.String
+	}
+	return ""
+}
+
+func (p *Profile) GetImageURL() string {
+	if p.ImageURL.Valid {
+		return p.ImageURL.String
+	}
+	return ""
 }
 
 type Experience struct {
@@ -40,16 +65,45 @@ type Skill struct {
 }
 
 type Project struct {
-	ID          int       `json:"id"`
-	Title       string    `json:"title"`
-	Description string    `json:"description"`
-	TechStack   string    `json:"tech_stack"`
-	ImageURL    string    `json:"image_url"`
-	DemoURL     string    `json:"demo_url"`
-	RepoURL     string    `json:"repo_url"`
-	Featured    bool      `json:"featured"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	ID          int
+	Title       string
+	Description string
+	TechStack   sql.NullString `json:"-"`
+	ImageURL    sql.NullString `json:"-"`
+	DemoURL     sql.NullString `json:"-"`
+	RepoURL     sql.NullString `json:"-"`
+	Featured    bool
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+}
+
+// Getters for JSON serialization
+func (p *Project) GetTechStack() string {
+	if p.TechStack.Valid {
+		return p.TechStack.String
+	}
+	return ""
+}
+
+func (p *Project) GetImageURL() string {
+	if p.ImageURL.Valid {
+		return p.ImageURL.String
+	}
+	return ""
+}
+
+func (p *Project) GetDemoURL() string {
+	if p.DemoURL.Valid {
+		return p.DemoURL.String
+	}
+	return ""
+}
+
+func (p *Project) GetRepoURL() string {
+	if p.RepoURL.Valid {
+		return p.RepoURL.String
+	}
+	return ""
 }
 
 type SocialLink struct {

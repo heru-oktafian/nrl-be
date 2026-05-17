@@ -17,10 +17,11 @@ func NewProfileRepository(db *pgxpool.Pool) *ProfileRepository {
 
 func (r *ProfileRepository) Get(ctx context.Context) (*entity.Profile, error) {
 	var p entity.Profile
-	err := r.db.QueryRow(ctx, `
+	row := r.db.QueryRow(ctx, `
 		SELECT id, name, title, bio, email, phone, location, image_url, created_at, updated_at
-		FROM profiles WHERE id = 1
-	`).Scan(&p.ID, &p.Name, &p.Title, &p.Bio, &p.Email, &p.Phone, &p.Location, &p.ImageURL, &p.CreatedAt, &p.UpdatedAt)
+		FROM profiles WHERE id = $1
+	`, 1)
+	err := row.Scan(&p.ID, &p.Name, &p.Title, &p.Bio, &p.Email, &p.Phone, &p.Location, &p.ImageURL, &p.CreatedAt, &p.UpdatedAt)
 	if err != nil {
 		return nil, err
 	}

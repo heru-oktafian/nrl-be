@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"log"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/heru-oktafian/nrl-be/internal/domain/entity"
 	"github.com/heru-oktafian/nrl-be/internal/domain/repository"
@@ -38,7 +40,19 @@ func (h *Handler) GetProfile(c *fiber.Ctx) error {
 	if err != nil {
 		return response.NotFound(c, "Profile not found")
 	}
-	return response.Success(c, profile)
+	// Convert to JSON-friendly map
+	return response.Success(c, fiber.Map{
+		"id":         profile.ID,
+		"name":       profile.Name,
+		"title":      profile.Title,
+		"bio":        profile.Bio,
+		"email":      profile.Email,
+		"phone":      profile.GetPhone(),
+		"location":   profile.GetLocation(),
+		"image_url":  profile.GetImageURL(),
+		"created_at": profile.CreatedAt,
+		"updated_at": profile.UpdatedAt,
+	})
 }
 
 // GetExperiences returns all experiences
@@ -69,12 +83,30 @@ func (h *Handler) GetSkills(c *fiber.Ctx) error {
 func (h *Handler) GetProjects(c *fiber.Ctx) error {
 	projects, err := h.projectRepo.GetAll(c.Context())
 	if err != nil {
+		log.Printf("GetProjects error: %v", err)
 		return response.InternalError(c, "Failed to fetch projects")
 	}
 	if projects == nil {
-		projects = []entity.Project{}
+		return response.Success(c, []interface{}{})
 	}
-	return response.Success(c, projects)
+
+	// Convert to JSON-friendly format
+	var result []fiber.Map
+	for _, p := range projects {
+		result = append(result, fiber.Map{
+			"id":          p.ID,
+			"title":       p.Title,
+			"description": p.Description,
+			"tech_stack":  p.GetTechStack(),
+			"image_url":   p.GetImageURL(),
+			"demo_url":    p.GetDemoURL(),
+			"repo_url":    p.GetRepoURL(),
+			"featured":    p.Featured,
+			"created_at":  p.CreatedAt,
+			"updated_at":  p.UpdatedAt,
+		})
+	}
+	return response.Success(c, result)
 }
 
 // GetSocialLinks returns all social links
@@ -152,8 +184,25 @@ func (h *Handler) GetPortfolio(c *fiber.Ctx) error {
 	}
 
 	projects, _ := h.projectRepo.GetAll(c.Context())
-	if projects == nil {
-		projects = []entity.Project{}
+	var projectList []fiber.Map
+	if projects != nil {
+		for _, p := range projects {
+			projectList = append(projectList, fiber.Map{
+				"id":          p.ID,
+				"title":       p.Title,
+				"description": p.Description,
+				"tech_stack":  p.GetTechStack(),
+				"image_url":   p.GetImageURL(),
+				"demo_url":    p.GetDemoURL(),
+				"repo_url":    p.GetRepoURL(),
+				"featured":    p.Featured,
+				"created_at":  p.CreatedAt,
+				"updated_at":  p.UpdatedAt,
+			})
+		}
+	}
+	if projectList == nil {
+		projectList = []fiber.Map{}
 	}
 
 	socialLinks, _ := h.socialLinkRepo.GetAll(c.Context())
@@ -166,12 +215,24 @@ func (h *Handler) GetPortfolio(c *fiber.Ctx) error {
 		tools = []entity.Tool{}
 	}
 
+	// Convert profile to JSON-friendly map
 	return response.Success(c, fiber.Map{
-		"profile":     profile,
-		"experiences": experiences,
-		"skills":      skills,
-		"projects":    projects,
+		"profile": fiber.Map{
+			"id":         profile.ID,
+			"name":       profile.Name,
+			"title":      profile.Title,
+			"bio":        profile.Bio,
+			"email":      profile.Email,
+			"phone":      profile.GetPhone(),
+			"location":   profile.GetLocation(),
+			"image_url":  profile.GetImageURL(),
+			"created_at": profile.CreatedAt,
+			"updated_at": profile.UpdatedAt,
+		},
+		"experiences":  experiences,
+		"skills":       skills,
+		"projects":     projectList,
 		"social_links": socialLinks,
-		"tools":       tools,
+		"tools":        tools,
 	})
 }
