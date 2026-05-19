@@ -10,6 +10,7 @@ type Profile struct {
 	Name      string         `json:"name"`
 	Title     string         `json:"title"`
 	Bio       string         `json:"bio"`
+	About     sql.NullString `json:"about"`
 	Email     string         `json:"email"`
 	Phone     sql.NullString `json:"-"`
 	Location  sql.NullString `json:"-"`
@@ -19,6 +20,13 @@ type Profile struct {
 }
 
 // Getters for JSON serialization
+func (p *Profile) GetAbout() string {
+	if p.About.Valid {
+		return p.About.String
+	}
+	return ""
+}
+
 func (p *Profile) GetPhone() string {
 	if p.Phone.Valid {
 		return p.Phone.String
@@ -132,4 +140,14 @@ type ContactMessage struct {
 	Message   string    `json:"message"`
 	Read      bool      `json:"read"`
 	CreatedAt time.Time `json:"created_at"`
+}
+
+type Service struct {
+	ID          int       `json:"id"`
+	Title       string    `json:"title"`
+	Description string    `json:"description"`
+	Icon        string    `json:"icon"`
+	Order       int       `json:"order"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }

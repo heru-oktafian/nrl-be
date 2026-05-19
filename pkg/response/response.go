@@ -42,3 +42,7 @@ func NotFound(c *fiber.Ctx, message string) error {
 func InternalError(c *fiber.Ctx, message string) error {
 	return Error(c, fiber.StatusInternalServerError, message)
 }
+
+func Unauthorized(c *fiber.Ctx, message string) error {
+	return Error(c, fiber.StatusUnauthorized, message)
+}

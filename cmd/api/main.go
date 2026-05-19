@@ -48,14 +48,6 @@ func main() {
 		AllowHeaders: "Origin,Content-Type,Accept,Authorization",
 	}))
 
-	// Health check
-	app.Get("/health", func(c *fiber.Ctx) error {
-		return c.JSON(fiber.Map{
-			"status":  "ok",
-			"service": "nrl-be",
-		})
-	})
-
 	// Setup routes
 	http.SetupRoutes(app, db)
 
